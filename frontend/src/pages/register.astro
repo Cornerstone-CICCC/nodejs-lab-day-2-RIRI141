@@ -1,0 +1,95 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout>
+  <h1>Create Account</h1>
+  <form id="signup-form">
+    <label>
+      Username:
+      <input
+        id="username"
+        type="text"
+        name="username"
+        placeholder="Enter username"
+        required
+      />
+    </label>
+    <label>
+      Password:
+      <input
+        id="password"
+        type="password"
+        name="password"
+        placeholder="Enter password"
+        required
+      />
+    </label>
+    <label>
+      First Name:
+      <input
+        type="text"
+        id="firstname"
+        name="firstname"
+        placeholder="Enter first name"
+        required
+      />
+    </label>
+    <label>
+      Last Name:
+      <input
+        type="text"
+        id="lastname"
+        name="lastname"
+        placeholder="Enter last name"
+        required
+      />
+    </label>
+    <button id="btn-signup" type="submit">Sign Up</button>
+  </form>
+</Layout>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const signupForm = document.querySelector("#signup-form");
+
+    if (signupForm) {
+      signupForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const username = document.querySelector(
+          "#username"
+        ) as HTMLInputElement;
+        const password = document.querySelector(
+          "#password"
+        ) as HTMLInputElement;
+        const firstname = document.querySelector(
+          "#firstname"
+        ) as HTMLInputElement;
+        const lastname = document.querySelector(
+          "#lastname"
+        ) as HTMLInputElement;
+
+        if (username && password && firstname && lastname) {
+          const res = await fetch(`http://localhost:4000/register`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              username: username.value,
+              password: password.value,
+              firstname: firstname.value,
+              lastname: lastname.value,
+            }),
+            credentials: "include",
+          });
+
+          if (res.ok) {
+            window.location.href = "/login";
+          }
+        }
+      });
+    }
+  });
+</script>
