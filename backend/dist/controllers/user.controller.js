@@ -14,10 +14,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const user_model_1 = __importDefault(require("../models/user.model"));
 // import use
-const home = (req, res) => {
-    res.status(200).send("Welcome to my server!");
-};
-// const signup = (req: Request, res: Response) => {
+// const home = (req: Request, res: Response) => {
+//     res.status(200).send("Welcome to my server!")
+// }
+// // const signup = (req: Request, res: Response) => {
 //     res.status(200).send("Welcome to signup!")
 // }
 // const login = (req: Request, res: Response) => {
@@ -30,25 +30,29 @@ const home = (req, res) => {
  * @param {Response} res
  * @returns {void}
  */
-const getUsers = (req, res) => {
-    const users = user_model_1.default.findAll();
-    res.status(200).json(users);
-};
+// const getUsers = (req: Request, res: Response) => {
+//     const users = userModel.findAll();
+//     if (!users) {
+//         res.status(500).json({
+//           message: "No users",
+//         });
+//     }    
+//     res.status(200).json(users);
+//   };
 /**
  * Get user by Username
  *
- * @param {Request<{username: string}>} req
+ * @param {Request} req
  * @param {Respose} res
  * @returns {void}
  */
 const getUserByUsername = (req, res) => {
-    const { username } = req.params;
-    const user = user_model_1.default.getUserByUsername(username);
-    if (!user) {
-        res.status(404).send("User not found");
+    if (req.session && req.session.username) {
+        const user = user_model_1.default.findByUsername(req.session.username);
+        res.status(200).json(user);
         return;
     }
-    res.status(200).json(user);
+    return res.status(404).json({ error: "User not found" });
 };
 /**
  * Add new User
@@ -58,6 +62,7 @@ const getUserByUsername = (req, res) => {
  * @returns {void}
  */
 const addUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("Received data:", req.body);
     const { username, password, firstname, lastname } = req.body;
     if (!username || !password || !firstname || !lastname) {
         res.status(500).json({
@@ -65,7 +70,7 @@ const addUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
         return;
     }
-    const user = yield user_model_1.default.addUser({ username, password, firstname, lastname });
+    const user = yield user_model_1.default.create({ username, password, firstname, lastname });
     if (!user) {
         res.status(409).json({
             error: "Username is taken"
@@ -74,6 +79,23 @@ const addUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
     res.status(201).json(user);
 });
+/**
+ * Delete by userID
+ *
+ * @param {Request<{id: string}>} req
+ * @param {Response} res
+ * @returns {void}
+ *
+ */
+// const deleteUserById = (req:Request<{id: string}>, res: Response) => {
+//     const { id } = req.params
+//     const result: boolean = userModel.removeUserById(id)
+//     if(!result) {
+//         res.status(404).json({ message: "User not found" })
+//         return
+//     }
+//     res.status(200).json({ message: "Deleted User"})
+// }
 /**
  * Login User
  *
@@ -100,14 +122,29 @@ const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         req.session.isLoggedIn = true;
         req.session.username = user.username;
     }
-    res.status(200).send("You Login");
+    res.status(200).send("You Logged in");
 });
+/**
+ * Logouted user
+ *
+ * @param {Request} req
+ * @param {Response} res
+ * @returns {void} Redirect to signup
+ */
+const logout = (req, res) => {
+    req.session = null;
+    res.status(200).json({
+        content: "Session cookie cleared!",
+    });
+};
 exports.default = {
-    home,
+    // home,
     // signup,
     // login,
-    getUsers,
+    // getUsers,
     getUserByUsername,
     addUser,
+    // deleteUserById,
     loginUser,
+    logout
 };

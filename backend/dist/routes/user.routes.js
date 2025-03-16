@@ -6,11 +6,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const user_controller_1 = __importDefault(require("../controllers/user.controller"));
 const userRouter = (0, express_1.Router)();
-userRouter.get('/', user_controller_1.default.home);
-// userRouter.get('/signup', userController.signup)
-// userRouter.get('/login', userController.login)
-userRouter.get('/users', user_controller_1.default.getUsers);
-userRouter.get('/:username', user_controller_1.default.getUserByUsername);
+userRouter.post('/register', user_controller_1.default.addUser);
 userRouter.post('/login', user_controller_1.default.loginUser);
-userRouter.post('/signup', user_controller_1.default.addUser);
+userRouter.get('/logout', user_controller_1.default.logout);
+userRouter.get('/check-auth', user_controller_1.default.getUserByUsername);
+// what is thie error?????
 exports.default = userRouter;

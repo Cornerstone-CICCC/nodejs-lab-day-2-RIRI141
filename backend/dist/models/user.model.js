@@ -21,13 +21,13 @@ class UserModel {
     findAll() {
         return this.users;
     }
-    getUserByUsername(username) {
-        const user = this.users.find(u => u.username === username);
+    findByUsername(username) {
+        const user = this.users.find((u) => u.username === username);
         if (!user)
-            return null;
+            return false;
         return user;
     }
-    addUser(newUser) {
+    create(newUser) {
         return __awaiter(this, void 0, void 0, function* () {
             const { username, password, firstname, lastname } = newUser;
             const foundIndex = this.users.findIndex(u => u.username === username);
@@ -45,6 +45,12 @@ class UserModel {
             return user;
         });
     }
+    // removeUserById(id: string) {
+    //     const foundIndex = this.users.findIndex(u => u.id === id)
+    //     if (foundIndex === -1) return false
+    //     this.users.splice(foundIndex, 1)
+    //     return true
+    // }
     checkUserPass(username, password) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = this.users.find(u => u.username === username);

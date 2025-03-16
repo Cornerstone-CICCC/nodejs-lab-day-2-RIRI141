@@ -9,13 +9,13 @@ class UserModel {
         return this.users
     }
 
-    getUserByUsername(username: string) {
-        const user = this.users.find(u => u.username === username)
-        if(!user) return null
+    findByUsername(username: string) {
+        const user = this.users.find((u) => u.username === username)
+        if(!user) return false
         return user
     }
 
-    async addUser(newUser: Omit<User, 'id'>) {
+    async create(newUser: Omit<User, 'id'>) {
         const { username, password, firstname, lastname } = newUser 
         const foundIndex = this.users.findIndex(u => u.username === username)
         if(foundIndex !== -1) return false
@@ -30,6 +30,13 @@ class UserModel {
         this.users.push(user)
         return user
     }
+
+    // removeUserById(id: string) {
+    //     const foundIndex = this.users.findIndex(u => u.id === id)
+    //     if (foundIndex === -1) return false
+    //     this.users.splice(foundIndex, 1)
+    //     return true
+    // }
 
     async checkUserPass(username:string, password: string) {
         const user = this.users.find(u => u.username === username)

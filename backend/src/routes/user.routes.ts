@@ -1,16 +1,15 @@
 import { Router } from "express";
 import userController from "../controllers/user.controller";
+import { checkAuth } from "../middleware/auth.middleware";
 
 
 const userRouter = Router()
 
-userRouter.get('/', userController.home)
-// userRouter.get('/signup', userController.signup)
-// userRouter.get('/login', userController.login)
-userRouter.get('/users', userController.getUsers)
-userRouter.get('/:username', userController.getUserByUsername)
+userRouter.post('/register', userController.addUser)
 userRouter.post('/login', userController.loginUser)
-userRouter.post('/signup', userController.addUser)
+userRouter.get('/logout', userController.logout)
+userRouter.get('/check-auth', userController.getUserByUsername)
+// what is thie error?????
 
 
 export default userRouter

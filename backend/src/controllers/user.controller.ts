@@ -3,10 +3,10 @@ import userModel from "../models/user.model";
 import { User } from "../types/user";
 // import use
 
-const home = (req: Request, res: Response) => {
-    res.status(200).send("Welcome to my server!")
-}
-// const signup = (req: Request, res: Response) => {
+// const home = (req: Request, res: Response) => {
+//     res.status(200).send("Welcome to my server!")
+// }
+// // const signup = (req: Request, res: Response) => {
 //     res.status(200).send("Welcome to signup!")
 // }
 // const login = (req: Request, res: Response) => {
@@ -20,29 +20,33 @@ const home = (req: Request, res: Response) => {
  * @param {Response} res
  * @returns {void}
  */
-const getUsers = (req: Request, res: Response) => {
-    const users = userModel.findAll();
-    res.status(200).json(users);
-  };
+// const getUsers = (req: Request, res: Response) => {
+//     const users = userModel.findAll();
+//     if (!users) {
+//         res.status(500).json({
+//           message: "No users",
+//         });
+//     }    
+//     res.status(200).json(users);
+//   };
 
 /**
  * Get user by Username
  * 
- * @param {Request<{username: string}>} req
+ * @param {Request} req
  * @param {Respose} res
  * @returns {void} 
  */
 
-const getUserByUsername = (req:Request<{username: string}>, res:Response) => {
-    const { username } = req.params
-    const user = userModel.getUserByUsername(username)
-    if(!user) {
-        res.status(404).send("User not found")
+const getUserByUsername = (req: Request, res: Response) => {
+    if (req.session &&  req.session.username) {
+        const user = userModel.findByUsername(req.session.username);
+        res.status(200).json(user);
         return
     }
-    res.status(200).json(user)
-}
-
+        return res.status(404).json({ error: "User not found" })
+  
+};
 /**
  * Add new User
  * 
@@ -51,6 +55,8 @@ const getUserByUsername = (req:Request<{username: string}>, res:Response) => {
  * @returns {void}
  */
 const addUser = async ( req: Request<{},{}, Omit<User, 'id'>>, res: Response) => {
+    console.log("Received data:", req.body); 
+
     const { username, password, firstname, lastname} = req.body
     if(!username || !password || !firstname || !lastname) {
         res.status(500).json({
@@ -58,7 +64,7 @@ const addUser = async ( req: Request<{},{}, Omit<User, 'id'>>, res: Response) =>
         })
         return
     }
-    const user = await userModel.addUser({ username, password ,firstname, lastname})
+    const user = await userModel.create({ username, password ,firstname, lastname})
     if(!user) {
         res.status(409).json({
             error: "Username is taken"
@@ -67,6 +73,25 @@ const addUser = async ( req: Request<{},{}, Omit<User, 'id'>>, res: Response) =>
     }
     res.status(201).json(user)
 }
+
+/**
+ * Delete by userID
+ * 
+ * @param {Request<{id: string}>} req
+ * @param {Response} res
+ * @returns {void}
+ * 
+ */
+// const deleteUserById = (req:Request<{id: string}>, res: Response) => {
+//     const { id } = req.params
+//     const result: boolean = userModel.removeUserById(id)
+//     if(!result) {
+//         res.status(404).json({ message: "User not found" })
+//         return
+//     }
+//     res.status(200).json({ message: "Deleted User"})
+// }
+
 
 /**
  * Login User 
@@ -94,19 +119,33 @@ const loginUser = async ( req: Request<{}, {}, Omit<User, 'id'>>, res: Response)
         req.session.isLoggedIn = true
         req.session.username = user.username
     }
-    res.status(200).send("You Login")
+    res.status(200).send("You Logged in")
 }
 
+/**
+ * Logouted user
+ *
+ * @param {Request} req
+ * @param {Response} res
+ * @returns {void} Redirect to signup
+ */
+const logout = (req: Request, res: Response) => {
+    req.session = null;
+    res.status(200).json({
+      content: "Session cookie cleared!",
+    });
+  };
 
 
 
 export default {
-    home,
+    // home,
     // signup,
     // login,
-    getUsers,
+    // getUsers,
     getUserByUsername,
     addUser,
+    // deleteUserById,
     loginUser,
-
+    logout
 }
